@@ -6,6 +6,7 @@ module publisher::aptos_horses_game
     use aptos_framework::aptos_coin::{AptosCoin};
     use std::vector;
     use std::signer;
+    use publisher::aptos_horses_publisher_signer;
 
     const EInvalidRaceId: u64 = 2;
     const EUserAlreadyInRace: u64 = 3;
@@ -26,6 +27,7 @@ module publisher::aptos_horses_game
     struct OngoingRace has store, copy, drop, key
     {
         race_id: u64,
+        bet_amount: u64,
         players: vector<address>,
         started: bool
     }
@@ -91,7 +93,7 @@ module publisher::aptos_horses_game
         assert!(vector::length<address>(&race.players) < CMaxRaceJoinCapacity, ERaceFull);
         vector::push_back<address>(&mut race.players, signer_pub_key);
 
-        coin::transfer<AptosCoin>(user, @publisher, race.price);
+        coin::transfer<AptosCoin>(user, signer::address_of(&aptos_horses_publisher_signer::get_signer()), race.price);
 
         if(vector::length<address>(&race.players) == CMaxRaceJoinCapacity)
         {
@@ -99,6 +101,7 @@ module publisher::aptos_horses_game
             let new_race = OngoingRace
             {
                 race_id: randomness::u64_range(100, 10000000),
+                bet_amount: race.price * vector::length<address>(&race.players),
                 players: race.players,
                 started: false
             };
@@ -112,11 +115,11 @@ module publisher::aptos_horses_game
     public fun can_start_race(account_address: address): (bool, u64) acquires OngoingRaces
     {
         let ongoing_races = &mut borrow_global_mut<OngoingRaces>(@publisher).ongoing_races;
-        // for(iter in 0..vector::length<OngoingRace>(&ongoing_races))
-        // {
-        //     let race = vector::borrow_mut(&ongoing_races, iter);
-        //     if(!race.started && vector::contains<address>(&race.plaeyrs, account_address)) return (true, race.race_id);
-        // };
+        for (iter in 0..vector::length<OngoingRace>(ongoing_races))
+        {
+            let race = vector::borrow_mut(ongoing_races, iter);
+            if(!race.started && vector::contains<address>(&race.players, &account_address)) return (true, race.race_id);
+        };
 
         (false, 0)
     }
@@ -124,31 +127,34 @@ module publisher::aptos_horses_game
     public entry fun start_race(race_id: u64) acquires OngoingRaces
     {
         let ongoing_races = &mut borrow_global_mut<OngoingRaces>(@publisher).ongoing_races;
-        // for(iter in 0..vector::length<OngoingRace>(&ongoing_races))
-        // {
-        //     let race = vector::borrow_mut(&ongoing_races, iter);
-        //     if(!race.race_id == race_id)
-        //     {
-        //         race.started = true;
-        //         break;
-        //     }
-        // };
+        for (iter in 0..vector::length<OngoingRace>(ongoing_races))
+        {
+            let race = vector::borrow_mut(ongoing_races, iter);
+            if(race.race_id == race_id)
+            {
+                race.started = true;
+                break
+            }
+        };
     }
 
     public entry fun on_race_end(race_id: u64, winning_order: vector<address>) acquires OngoingRaces
     {
-        // Distribute awards
-
         let ongoing_races = &mut borrow_global_mut<OngoingRaces>(@publisher).ongoing_races;
-        // for(iter in 0..vector::length<OngoingRace>(&ongoing_races))
-        // {
-        //     let race = vector::borrow_mut(&ongoing_races, iter);
-        //     if(!race.race_id == race_id)
-        //     {
-        //         vector::remove<OngoingRace>(&mut ongoing_races, iter);
-        //         break;
-        //     }
-        // };
+        for (i in 0..vector::length<OngoingRace>(ongoing_races))
+        {
+            let race = vector::borrow_mut(ongoing_races, i);
+            if(race.race_id == race_id)
+            {
+                for (j in 0..vector::length<address>(&winning_order))
+                {
+                    //Fix bet amount
+                    coin::transfer<AptosCoin>(&aptos_horses_publisher_signer::get_signer(), *vector::borrow(&winning_order, j), race.bet_amount / (2 * (j + 1)));
+                };
+                vector::remove<OngoingRace>(ongoing_races, i);
+                break
+            }
+        };
     }
 
     public entry fun leave_race(user: &signer, race_id: u64) acquires Races
@@ -163,6 +169,6 @@ module publisher::aptos_horses_game
         assert!(exist, EUserNotInRace);
         vector::remove<address>(&mut race.players, index);
 
-        coin::transfer<AptosCoin>(user, @publisher, race.price);
+        coin::transfer<AptosCoin>(&aptos_horses_publisher_signer::get_signer(), signer_pub_key, race.price);
     }
 }

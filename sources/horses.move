@@ -4,6 +4,7 @@ module publisher::aptos_horses
     use aptos_framework::object;
     use std::option::{Self, Option};
     use std::vector;
+    use std::signer;
     use std::string::{Self, String};
     use aptos_std::smart_table::{Self, SmartTable};
     use aptos_framework::randomness;
@@ -11,6 +12,7 @@ module publisher::aptos_horses
     use aptos_std::string_utils;
     use aptos_framework::coin;
     use aptos_framework::aptos_coin::{AptosCoin};
+    use publisher::aptos_horses_publisher_signer;
 
     struct Collection has key 
     {
@@ -118,7 +120,7 @@ module publisher::aptos_horses
         let token_signer = object::generate_signer(&constructor_ref);
         move_to(&token_signer, *horse);
 
-        coin::transfer<AptosCoin>(creator, @publisher, horse.price);
+        coin::transfer<AptosCoin>(creator, signer::address_of(&aptos_horses_publisher_signer::get_signer()), horse.price);
     }
 
     fun get_max_speed_of_type(type: u64): u64
