@@ -10,7 +10,7 @@ module publisher::aptos_horses_publisher_signer
 
     fun init_module(account: &signer) 
     {
-        let signer_cap = resource_account::retrieve_resource_account_cap(account, @publisher);
+        let signer_cap = resource_account::retrieve_resource_account_cap(account, @resource_publisher);
         move_to(account, PermissionConfig 
         {
             signer_cap,
