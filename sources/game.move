@@ -41,9 +41,9 @@ module publisher::aptos_horses_game
             {
                 race_id: 0,
                 name: string::utf8(b"1 Lap"),
-                price: 10,
+                price: 10 * 100000000,
                 laps: 1,
-                bet_amount: 50,
+                bet_amount: 50 * 100000000,
                 started: false,
                 players: vector::empty<address>()
             },
@@ -51,9 +51,9 @@ module publisher::aptos_horses_game
             {
                 race_id: 1,
                 name: string::utf8(b"3 Laps"),
-                price: 7,
+                price: 7 * 100000000,
                 laps: 3,
-                bet_amount: 35,
+                bet_amount: 35 * 100000000,
                 started: false,
                 players: vector::empty<address>()
             },
@@ -61,9 +61,9 @@ module publisher::aptos_horses_game
             {
                 race_id: 2,
                 name: string::utf8(b"5 Laps"),
-                price: 4,
+                price: 4 * 100000000,
                 laps: 5,
-                bet_amount: 20,
+                bet_amount: 20 * 100000000,
                 started: false,
                 players: vector::empty<address>()
             },
@@ -104,7 +104,7 @@ module publisher::aptos_horses_game
             let random_acc: vector<u64> = vector::empty<u64>();
             for (j in 0..vector::length<address>(&race.players))
             {
-                vector::push_back<u64>(&mut random_acc, randomness::u64_range(25, 190) / 100);
+                vector::push_back<u64>(&mut random_acc, randomness::u64_range(25, 190));
             };
 
             let random_hurdles_players: vector<vector<u64>> = vector::empty<vector<u64>>();
@@ -113,7 +113,7 @@ module publisher::aptos_horses_game
                 let random_hurdles: vector<u64> = vector::empty<u64>();
                 for (k in 0..race.laps)
                 {
-                    vector::push_back<u64>(&mut random_hurdles, randomness::u64_range(20, 80) / 100);
+                    vector::push_back<u64>(&mut random_hurdles, randomness::u64_range(20, 80));
                 };
                 vector::push_back<vector<u64>>(&mut random_hurdles_players, random_hurdles);
             };

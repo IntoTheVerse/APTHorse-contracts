@@ -29,11 +29,12 @@ module publisher::aptos_horses
 
     struct Horse has store, copy, drop, key
     {
+        id: u64,
         name: String,
         description: String,
         uri: String,
         price: u64,
-        speed: Option<u64>
+        speed: u64
     }
 
     fun init_module(admin: &signer) 
@@ -42,35 +43,39 @@ module publisher::aptos_horses
         vector<Horse>[
             Horse
             {
+                id: 0,
                 name: string::utf8(b"Midnight Star"),
                 description: string::utf8(b"Ride the fastest horse in the west through treacherous terrain and wild weather"),
-                price: 4,
+                price: 4 * 100000000,
                 uri: string::utf8(b"https://bafkreiewuq5pbrecvq7z7kohdoxyo66p7n3nc2hnilxiiwe3okz3tpkpwi.ipfs.nftstorage.link/"),
-                speed: option::some(0)
+                speed: 0
             },
             Horse
             {
+                id: 1,
                 name: string::utf8(b"Golden Blaze"),
                 description: string::utf8(b"Explore mystical lands under the cloak of night on this mysterious and elegant horse"),
-                price: 6,
+                price: 6 * 100000000,
                 uri: string::utf8(b"https://bafkreib7ndr2kd52qvhgukpdihuel6yi222pmn43gr3ffignyx52iqzw7q.ipfs.nftstorage.link/"),
-                speed: option::some(0)
+                speed: 0
             },
             Horse
             {
+                id: 2,
                 name: string::utf8(b"Silver Moon"),
                 description: string::utf8(b"Embark on a quest for gold and glory with this majestic and noble steed"),
-                price: 8,
+                price: 8 * 100000000,
                 uri: string::utf8(b"https://bafkreicb3ebvgbazgqqfillv6p2kdktgw5fgkrvzqam23eyxvimlmlxuge.ipfs.nftstorage.link/"),
-                speed: option::some(0)
+                speed: 0
             },
             Horse
             {
+                id: 3,
                 name: string::utf8(b"Stormy Lightening"),
                 description: string::utf8(b"Journey through enchanted forests and mystical realms under the silver light of the moon"),
-                price: 10,
+                price: 10 * 100000000,
                 uri: string::utf8(b"https://bafkreidww2qkvocxuhnumbsvxl2v4kbgej62bsh5tw355eb2lcgqvyf6xe.ipfs.nftstorage.link/"),
-                speed: option::some(0)
+                speed: 0
             },
         ];
 
@@ -101,12 +106,12 @@ module publisher::aptos_horses
         });
     }
 
-    public entry fun mint_horse(creator: &signer, type: u64) acquires Horses
+    public entry fun mint_horse(creator: &signer, horse_id: u64) acquires Horses
     {
         let horses = &mut borrow_global_mut<Horses>(@publisher).horses;
-        let horse = vector::borrow_mut(horses, type);
+        let horse = vector::borrow_mut(horses, horse_id);
 
-        horse.speed = option::some(randomness::u64_range(5, get_max_speed_of_type(type)));
+        horse.speed = randomness::u64_range(5, get_max_speed_of_type(horse_id));
 
         let constructor_ref = token::create_named_token(
             creator,
