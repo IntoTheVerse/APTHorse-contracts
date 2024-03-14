@@ -99,7 +99,7 @@ module publisher::aptos_horses_game
     {
         let races = &mut borrow_global_mut<Races>(@publisher).races;
         let race = vector::borrow_mut(races, race_id);
-        if(!race.started && vector::contains<address>(&race.players, &account_address)) 
+        if(!race.started && vector::contains<address>(&race.players, &account_address) && vector::length<address>(&race.players) == CMaxRaceJoinCapacity) 
         {
             let random_acc: vector<u64> = vector::empty<u64>();
             for (j in 0..vector::length<address>(&race.players))
