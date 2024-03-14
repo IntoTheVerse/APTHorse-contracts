@@ -1,0 +1,6 @@
+Call aptos init --profile default --network custom --rest-url https://fullnode.random.aptoslabs.com --faucet-url https://faucet.random.aptoslabs.com
+Change rest-url and faucet-url based on the endpoint
+enter the new private key of the address which will be used to publish this modules, can be taken from Petra. 
+use account address as resource_publisher in move.toml
+Replace APTHorse with project name and run aptos move create-resource-account-and-publish-package --seed APTHorse --address-name publisher
+Replace the mismatched address with the address shown in the terminal, run the above CLI command again

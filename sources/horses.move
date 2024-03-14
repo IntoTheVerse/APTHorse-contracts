@@ -128,7 +128,7 @@ module publisher::aptos_horses
             horse.description,
             horse.name,
             option::none(),
-            string_utils::format2(&b"{},{}", horse.uri, horse.price)
+            string_utils::format2(&b"{},{}", horse.id, horse.speed)
         );
 
         let token_signer = object::generate_signer(&constructor_ref);
