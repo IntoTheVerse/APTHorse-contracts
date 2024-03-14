@@ -77,6 +77,15 @@ module publisher::aptos_horses
                 uri: string::utf8(b"https://bafkreidww2qkvocxuhnumbsvxl2v4kbgej62bsh5tw355eb2lcgqvyf6xe.ipfs.nftstorage.link/"),
                 speed: 0
             },
+            Horse
+            {
+                id: 4,
+                name: string::utf8(b"Scarlet Sprinter"),
+                description: string::utf8(b"A fiery racer with speed unmatched, Scarlet Sprinter dominates the track with crimson grace"),
+                price: 12 * 100000000,
+                uri: string::utf8(b"https://bafkreib245ja4zr5v7ubryatoqxy5y4zxpbvfsaaooe2d4rik7nyee3xje.ipfs.nftstorage.link/"),
+                speed: 0
+            },
         ];
 
         move_to(admin, Horses { horses });
@@ -128,9 +137,9 @@ module publisher::aptos_horses
         coin::transfer<AptosCoin>(creator, signer::address_of(&aptos_horses_publisher_signer::get_signer()), horse.price);
     }
 
-    fun get_max_speed_of_type(type: u64): u64
+    fun get_max_speed_of_type(horse_id: u64): u64
     {
-        let max: u64 = if(type == 0) 10 else if (type == 1) 13 else if(type == 2) 16 else if(type == 3) 19 else 0;
+        let max: u64 = if(horse_id == 0) 10 else if(horse_id == 1) 13 else if(horse_id == 2) 16 else if(horse_id == 3) 19 else if(horse_id == 4) 22 else 0;
         max
     }
 }
