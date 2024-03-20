@@ -125,15 +125,22 @@ module publisher::aptos_horses_game
         (false, 0, vector::empty<u64>(), vector::empty<vector<u64>>())
     }
 
-    public entry fun on_race_end(race_id: u64, winning_order: vector<address>) acquires Races
+    public entry fun on_race_end(race_id: u64, first: address, second: address, third: address, forth: address, fifth: address) acquires Races
     {
         let races = &mut borrow_global_mut<Races>(@publisher).races;
         let race = vector::borrow_mut(races, race_id);
-        for (j in 0..vector::length<address>(&winning_order))
-        {
-            let receiveable_amount = randomness::u64_range(get_min_reward_by_winning_order(j), get_mix_reward_by_winning_order(j));
-            coin::transfer<AptosCoin>(&aptos_horses_publisher_signer::get_signer(), *vector::borrow(&winning_order, j), receiveable_amount);
-        };
+
+        let receiveable_amount_percent = randomness::u64_range(get_min_reward_by_winning_order(0), get_mix_reward_by_winning_order(0));
+        coin::transfer<AptosCoin>(&aptos_horses_publisher_signer::get_signer(), first, (race.bet_amount / 100) * receiveable_amount_percent);
+        receiveable_amount_percent = randomness::u64_range(get_min_reward_by_winning_order(1), get_mix_reward_by_winning_order(1));
+        coin::transfer<AptosCoin>(&aptos_horses_publisher_signer::get_signer(), second, (race.bet_amount / 100) * receiveable_amount_percent);
+        receiveable_amount_percent = randomness::u64_range(get_min_reward_by_winning_order(2), get_mix_reward_by_winning_order(2));
+        coin::transfer<AptosCoin>(&aptos_horses_publisher_signer::get_signer(), third, (race.bet_amount / 100) * receiveable_amount_percent);
+        receiveable_amount_percent = randomness::u64_range(get_min_reward_by_winning_order(3), get_mix_reward_by_winning_order(3));
+        coin::transfer<AptosCoin>(&aptos_horses_publisher_signer::get_signer(), forth, (race.bet_amount / 100) * receiveable_amount_percent);
+        receiveable_amount_percent = randomness::u64_range(get_min_reward_by_winning_order(4), get_mix_reward_by_winning_order(4));
+        coin::transfer<AptosCoin>(&aptos_horses_publisher_signer::get_signer(), fifth, (race.bet_amount / 100) * receiveable_amount_percent);
+
         race.players = vector::empty<address>();
         race.started = false;
     }
