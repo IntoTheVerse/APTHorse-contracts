@@ -130,29 +130,19 @@ module publisher::aptos_horses_game
         let races = &mut borrow_global_mut<Races>(@publisher).races;
         let race = vector::borrow_mut(races, race_id);
 
-        let receiveable_amount_percent = randomness::u64_range(get_min_reward_by_winning_order(0), get_mix_reward_by_winning_order(0));
+        let receiveable_amount_percent = randomness::u64_range(30, 40);
         coin::transfer<AptosCoin>(&aptos_horses_publisher_signer::get_signer(), first, (race.bet_amount / 100) * receiveable_amount_percent);
-        receiveable_amount_percent = randomness::u64_range(get_min_reward_by_winning_order(1), get_mix_reward_by_winning_order(1));
+        receiveable_amount_percent = randomness::u64_range(15, 25);
         coin::transfer<AptosCoin>(&aptos_horses_publisher_signer::get_signer(), second, (race.bet_amount / 100) * receiveable_amount_percent);
-        receiveable_amount_percent = randomness::u64_range(get_min_reward_by_winning_order(2), get_mix_reward_by_winning_order(2));
+        receiveable_amount_percent = randomness::u64_range(10, 15);
         coin::transfer<AptosCoin>(&aptos_horses_publisher_signer::get_signer(), third, (race.bet_amount / 100) * receiveable_amount_percent);
-        receiveable_amount_percent = randomness::u64_range(get_min_reward_by_winning_order(3), get_mix_reward_by_winning_order(3));
+        receiveable_amount_percent = randomness::u64_range(5, 10);
         coin::transfer<AptosCoin>(&aptos_horses_publisher_signer::get_signer(), forth, (race.bet_amount / 100) * receiveable_amount_percent);
-        receiveable_amount_percent = randomness::u64_range(get_min_reward_by_winning_order(4), get_mix_reward_by_winning_order(4));
+        receiveable_amount_percent = randomness::u64_range(3, 7);
         coin::transfer<AptosCoin>(&aptos_horses_publisher_signer::get_signer(), fifth, (race.bet_amount / 100) * receiveable_amount_percent);
 
         race.players = vector::empty<address>();
         race.started = false;
-    }
-
-    fun get_min_reward_by_winning_order(j: u64): u64
-    {
-        if (j == 0) 30 else if (j == 1) 15 else if (j == 2) 10 else if (j == 3) 5 else 3
-    }
-
-    fun get_mix_reward_by_winning_order(j: u64): u64
-    {
-        if (j == 0) 40 else if (j == 1) 25 else if (j == 2) 15 else if (j == 3) 10 else 7
     }
 
     public entry fun leave_race(user: &signer, race_id: u64) acquires Races
